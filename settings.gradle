@@ -1,0 +1,2 @@
+rootProject.name = 'ankus_dasops_jupyter'
+include 'ankus_dasops_common'

@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class StandardTermService {
     private StandardTermCatRepository catRepo;
     @Autowired
     private StandardWordRepository wordRepo;
+
+    @Value("${ankus.home}")
+    String ankusHome;
 
     public List<StandardTermView> termList(String searchCol, String searchWord, String orderCol, boolean asc, int category) {
         PageRequest pr = PageRequest.of(0, 100, asc?
@@ -203,14 +207,10 @@ public class StandardTermService {
 
         MultipartFile mf = files.get(0);
         if (!mf.getOriginalFilename().isEmpty()) {
-            File f = new File("/Users/onycom/dev-workspace/ankus_advance_simple_api/" + UUID.randomUUID().toString() + ".csv");
+            File f = new File(ankusHome + File.separator + UUID.randomUUID().toString() + ".csv");
 
             try {
-                System.out.println(mf.getSize());
                 mf.transferTo(f);   //throw
-
-                System.out.println(f.length());
-                System.out.println(f.getAbsolutePath());
 
                 List<StandardTermView> terms = new ArrayList<>();
 

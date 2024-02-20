@@ -41,8 +41,8 @@ public class ShareCodeTagRepositoryImpl extends QuerydslRepositorySupport implem
                         Projections.bean(TagDto.class, ct.codeTagId.tagId, ct.name)).from(ct)
                 .where(ct.codeTagId.codeId.eq(id));
 
-        if (query2.fetchCount() == 0)
-            return null;
+        //if (query2.fetchCount() == 0)
+          //  return null;
 
         return query2.fetch();
     }//findTagByCodeId

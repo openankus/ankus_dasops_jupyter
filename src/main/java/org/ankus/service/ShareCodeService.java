@@ -44,8 +44,15 @@ public class ShareCodeService {
     }
 
     public Page<ShareCodeView> codeList(String searchCol, List<String> searchList, String orderCol, boolean asc, int pageNo) {
-        PageRequest pr = PageRequest.of(pageNo, 5, asc?
-                Sort.by(Sort.Order.asc(orderCol).ignoreCase()) : Sort.by(Sort.Order.desc(orderCol).ignoreCase()));
+        PageRequest pr;
+
+        if (pageNo <0) {
+            pr = PageRequest.of(0, Integer.MAX_VALUE, asc?
+                    Sort.by(Sort.Order.asc(orderCol).ignoreCase()) : Sort.by(Sort.Order.desc(orderCol).ignoreCase()));
+        } else {
+            pr = PageRequest.of(pageNo, 5, asc ?
+                    Sort.by(Sort.Order.asc(orderCol).ignoreCase()) : Sort.by(Sort.Order.desc(orderCol).ignoreCase()));
+        }
         //Page<ShareCode> codelist = null;
 
         //whole
@@ -160,6 +167,15 @@ public class ShareCodeService {
         }
 
         return code;
+    }//updateCode
+
+    //ver1.1.1
+    public CodeDto updateCodeContent(long id, String code) {
+        CodeDto cdto = codeRepo.findById(id);
+        cdto.setContent(code);
+
+        ShareCode sc = codeRepo.save(cdto.toEntity());
+        return sc.toDTO();
     }
 
     public void deleteCodeTag(long cid, List<Integer> tid) {

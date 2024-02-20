@@ -243,6 +243,99 @@ public class ShareCodeController {
         return new ResponseEntity<>(code, header, HttpStatus.OK);
     }
 
+    //ver1.1.1
+    @PutMapping(value = "share-code/modify/prop")
+    public ResponseEntity modifyProp(@RequestBody Map<String, Object> body, HttpSession httpSession){
+        //token -> user id
+        String id = JwtTokenProvider.validateToken((String) body.get("token"));
+        if (id == null)
+            return new  ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        Map map = (Map) body.get("code");
+        CodeDto dto = codeService.codeDetail(Long.valueOf((Integer) map.get("codeId")));
+        //description
+        dto.setCodeComment((String) map.get("codeComment"));   //comment
+
+        //tag list
+        List list = new ArrayList();
+        List<String> tags = (List) map.get("tags");
+        tags.forEach(tag -> list.add(new TagDto(tag)));
+        dto.setTags(list);
+
+        codeService.updateCode(dto);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }//modifyProp
+
+    //ver1.1.1
+    @PutMapping(value = "share-code/modify/code")
+    public ResponseEntity modifyCodeContent(@RequestBody Map<String, Object> body, HttpSession httpSession){
+        //token -> user id
+        String id = JwtTokenProvider.validateToken((String) body.get("token"));
+        if (id == null)
+            return new  ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        Map map = (Map) body.get("code");
+
+        ArrayList<String> al = (ArrayList<String>) map.get("content");
+        //check code content
+        if (al != null) {
+            //ipynb 형식으로 저장 : {cells:[]}
+            Map cmap = new HashMap();
+            cmap.put("cells", al);
+
+            try {
+                //code.setCodeId(Long.valueOf((Integer) map.get("codeId")));
+                //update code
+                CodeDto code = codeService.updateCodeContent(Long.valueOf((Integer) map.get("codeId")), new ObjectMapper().writeValueAsString(cmap));
+
+                //response
+                HttpHeaders header = new HttpHeaders();
+                header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+                return new ResponseEntity<>(code, header, HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } //if : check code content
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }//modifyCodeContent
+
+    //ver1.1.1
+    @PutMapping(value = "share-code/modify/name")
+    public ResponseEntity modifyCodeName(@RequestBody Map<String, Object> body, HttpSession httpSession){
+        //token -> user id
+        String id = JwtTokenProvider.validateToken((String) body.get("token"));
+        if (id == null)
+            return new  ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        Map map = (Map) body.get("code");
+        CodeDto dto = codeService.codeDetail(Long.valueOf((Integer) map.get("codeId")));
+        dto.setTitle((String) map.get("title"));
+        codeService.updateCode(dto);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }//modifyCodeContent
+
+    //ver1.1.1
+    @PostMapping(value = "share-code/duplicate")
+    public ResponseEntity duplicateCode(@RequestBody Map<String, Object> body, HttpSession httpSession){
+        //token -> user id
+        String id = JwtTokenProvider.validateToken((String) body.get("token"));
+        if (id == null)
+            return new  ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        Map map = (Map) body.get("code");
+        CodeDto dto = codeService.codeDetail((Integer) map.get("codeId"));
+        //init id
+        dto.setCodeId(0L);
+        //writer no
+        dto.setWriter(Long.valueOf((Integer) map.get("writer")));
+        //save
+        codeService.addCode(dto);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }//modifyCodeContent
+
     @PostMapping(value = "share-code/{code_id}")
     public ResponseEntity codeDetail(@PathVariable long code_id, @RequestBody Map<String, String> body, HttpSession httpSession){
         if (JwtTokenProvider.validateToken(body.get("token")) == null)

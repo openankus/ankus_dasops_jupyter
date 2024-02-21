@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ankus.service.ShareCodeService;
 import org.ankus.model.*;
-import org.ankus.model.Role;
-import org.ankus.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.*;
